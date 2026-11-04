@@ -167,6 +167,13 @@ button:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
 #inicio .marca img{width:100%;height:auto;display:block;-webkit-mask-image:none;mask-image:none}
 #inicio .toca{margin:28px 0 0;font-family:var(--font-display);font-weight:600;font-size:1rem;letter-spacing:.08em;color:var(--ink-soft);animation:inicioLatido 1.8s ease-in-out infinite}
 @keyframes inicioLatido{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* 4-11-2026: banderas de idioma (solo en el menú) */
+#idiomas{margin:14px 0 0;display:flex;justify-content:center;gap:14px}
+#idiomas[hidden]{display:none}
+#idiomas button{pointer-events:auto;width:34px;height:23px;padding:0;border:0;border-radius:4px;overflow:hidden;cursor:pointer;opacity:.35;box-shadow:0 2px 6px rgba(60,35,15,.35);transition:opacity .2s}
+#idiomas button.on{opacity:1}
+#idiomas svg{display:block;width:100%;height:100%}
 </style>
 </head>
 <body>
@@ -189,7 +196,8 @@ button:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
 <button type="button" id="mOnline">Online</button>
 <button type="button" id="mEstilo">Tablero y fichas</button>
 <button type="button" id="mReglas">Instrucciones</button>
-</div><p id="firma">DIY-BonProfit Games</p></div>
+</div><p id="firma">DIY-BonProfit Games</p><div id="idiomas" hidden><button type="button" data-l="es" aria-label="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/></svg></button><button type="button" data-l="en" aria-label="English"><svg viewBox="0 0 60 40"><clipPath id="uk"><rect width="60" height="40"/></clipPath><g clip-path="url(#uk)"><rect width="60" height="40" fill="#012169"/><path d="M0,0 60,40M60,0 0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 60,40M60,0 0,40" stroke="#C8102E" stroke-width="3"/><path d="M30,0V40M0,20H60" stroke="#fff" stroke-width="12"/><path d="M30,0V40M0,20H60" stroke="#C8102E" stroke-width="7"/></g></svg></button></div>
+</div>
 <div id="reglas" hidden><div class="card"><h2>Instrucciones</h2><div class="texto">
 <p>Coloca fichas en el tablero. Provoca conflictos para desplazarlas. Consigue puntos por cada ficha que logres subir a la esquina superior izquierda.</p>
 <h3>Conflictos</h3><ul>
@@ -873,3 +881,72 @@ resize();nuevaPartida('dos');requestAnimationFrame(frame);
 </script>
 </body>
 </html>
+<script>
+/* 4-11-2026: Tocotó en español e inglés. Se traduce lo que el juego escribe, sin tocar el juego. */
+(function(){
+"use strict";
+var EN={
+"Solitario":"Solitaire","1 vs IA":"1 vs AI","Tablero y fichas":"Board & pieces","Instrucciones":"How to play","Volver":"Back","Menú":"Menu",
+"toca para empezar":"tap to start","Pasar turno":"End turn","Terminar":"Finish",
+"Tu turno":"Your turn","Turno de la máquina":"Computer's turn","Turno del rival":"Opponent's turn","Toca tu montón":"Tap your pile",
+"Pon la ficha en una casilla iluminada":"Place the piece on a lit square","Toca adónde la mueves":"Tap where to move it",
+"Mueve una ficha o pasa turno":"Move a piece or end your turn","Resuelve los conflictos y toca el montón":"Solve the conflicts and tap your pile",
+"Resuelve los conflictos y termina":"Solve the conflicts and finish","¿Quién empieza?":"Who goes first?","Empiezas tú":"You go first",
+"Empieza la máquina":"The computer goes first","La máquina está pensando…":"The computer is thinking…",
+"¿Volver al menú?":"Back to menu?","Se pierde esta partida.":"This game will be lost.","Sí":"Yes",
+"Contra la máquina":"Against the computer","Fácil":"Easy","Difícil":"Hard",
+"Crear sala":"Create lobby","Unirme":"Join","Código de tu sala:":"Your lobby code:","Conectando…":"Connecting…",
+"Espera al rival":"Wait for your opponent","El rival se ha desconectado":"Your opponent disconnected","El código tiene 4 letras":"The code has 4 letters",
+"No encuentro esa sala. Revisa el código.":"Lobby not found. Check the code.","No hay conexión a internet":"No internet connection",
+"No se ha podido cargar el motor 3D. Recarga la página.":"The 3D engine could not load. Reload the page.",
+"¡Has ganado!":"You win!","Gana la máquina":"The computer wins","Gana el rival":"Your opponent wins","Empate":"Draw","Recuento":"Score",
+"Tú":"You","Rival":"Opponent","Máquina":"Computer","Mías":"Mine","Del rival":"Opponent's","Ganadas":"Won","Caídas":"Fallen","Pasar":"Turn penalty",
+"Volver al menú":"Back to menu","Tablero":"Board","Fichas":"Pieces","Jugador 1":"Player 1","Jugador 2":"Player 2",
+"Nogal":"Walnut","Olivo":"Olive","Mármol":"Marble","Pizarra":"Slate","Madera clara":"Light wood","Nogal oscuro":"Dark walnut",
+"Mármol negro":"Black marble","Negras lisas":"Plain black","Jade blanco":"White jade","Pizarra gris":"Grey slate",
+"Coloca fichas en el tablero. Provoca conflictos para desplazarlas. Consigue puntos por cada ficha que logres subir a la esquina superior izquierda.":"Place pieces on the board. Create conflicts to move them. Score points for every piece you get to the top-left corner.",
+"Conflictos":"Conflicts",
+"Dos fichas del mismo color o con la misma forma en las filas verticales generan un conflicto que has de resolver moviendo una de ellas a la izquierda.":"Two pieces of the same colour or the same shape in a column create a conflict. Solve it by moving one of them left.",
+"Dos fichas del mismo color o con la misma forma en las filas horizontales generan un conflicto que has de resolver moviendo una de ellas hacia arriba.":"Two pieces of the same colour or the same shape in a row create a conflict. Solve it by moving one of them up.",
+"Por cada ficha de tu montón que consigas llevar a la esquina del rival ganas 5 puntos.":"Each of your pieces you get to your opponent's corner: +5 points.",
+"Por cada ficha del rival que consigas llevar a su esquina consigues 1 punto.":"Each of your opponent's pieces you push to their corner: +1 point.",
+"Por cada ficha tuya que se salga del tablero pierdes 5 puntos.":"Each of your pieces that falls off the board: −5 points.",
+"Por cada ficha del rival que se salga del tablero pierdes 1 punto.":"Each of your opponent's pieces that falls off the board: −1 point.",
+"Si intentas pasar turno con un conflicto en el tablero pierdes 1 punto.":"Trying to end your turn with a conflict on the board: −1 point.",
+"Creadores":"Creators","1 vs 1, 1 vs IA":"1 vs 1, 1 vs AI",
+"Sonido":"Sound","Silenciar":"Mute","Volumen":"Volume","Toca para empezar":"Tap to start","Tablero de juego en 3D":"3D game board","Código de la sala":"Lobby code"
+};
+var PATRONES=[
+ [/^Turno: (.+)$/, function(m){return "Turn: "+(EN[m[1]]||m[1]);}],
+ [/^Solitario · (-?\d+|−\d+) puntos$/, function(m){return "Solitaire · "+m[1]+" points";}],
+ [/^Buscando la sala (.+)…$/, function(m){return "Looking for lobby "+m[1]+"…";}],
+ [/^Gana (.+)$/, function(m){return (EN[m[1]]||m[1])+" wins";}]
+];
+function tr(t){var a=t.match(/^(\s*)([\s\S]*?)(\s*)$/),x=a[2];if(!x)return t;var y=EN[x];
+  if(y===undefined){for(var i=0;i<PATRONES.length;i++){var m=x.match(PATRONES[i][0]);if(m){y=PATRONES[i][1](m);break;}}}
+  return y===undefined?t:a[1]+y+a[3];}
+var ORIG=new WeakMap(),HECHO=new WeakMap(),LANG="es",ATR=["aria-label"];
+function leer(){try{return localStorage.getItem("tocoto_idioma");}catch(e){return null;}}
+LANG=leer()||((navigator.language||"es").toLowerCase().indexOf("es")===0?"es":"en");
+function texto(n){ if(n.nodeType!==3)return; var p=n.parentNode; if(p&&/^(SCRIPT|STYLE)$/.test(p.nodeName))return;
+  if(LANG==="en"){ if(HECHO.get(n)===n.data)return; var y=tr(n.data); if(y!==n.data){ORIG.set(n,n.data);n.data=y;} HECHO.set(n,n.data); }
+  else{ var o=ORIG.get(n); if(o!==undefined&&HECHO.get(n)===n.data){n.data=o;} ORIG.delete(n);HECHO.delete(n); } }
+function atributos(e){ if(e.nodeType!==1)return; ATR.forEach(function(a){ if(!e.hasAttribute(a))return; var k="data-es-"+a;
+  if(LANG==="en"){ var v=e.getAttribute(a),y=tr(v); if(y!==v){e.setAttribute(k,v);e.setAttribute(a,y);} }
+  else if(e.hasAttribute(k)){e.setAttribute(a,e.getAttribute(k));e.removeAttribute(k);} }); }
+function todo(raiz){ var w=document.createTreeWalker(raiz,NodeFilter.SHOW_TEXT,null),n; while((n=w.nextNode()))texto(n);
+  if(raiz.querySelectorAll){atributos(raiz);raiz.querySelectorAll("[aria-label]").forEach(atributos);} }
+new MutationObserver(function(ms){ ms.forEach(function(m){
+  if(m.type==="characterData")texto(m.target);
+  else if(m.type==="attributes")atributos(m.target);
+  else m.addedNodes.forEach(function(n){ if(n.nodeType===3)texto(n); else if(n.nodeType===1)todo(n); }); });
+}).observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATR});
+var caja=document.getElementById("idiomas"),menu=document.getElementById("menu");
+function pinta(){ caja.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.l===LANG);}); document.documentElement.lang=LANG; }
+function pon(l){ if(l===LANG)return; LANG=l; try{localStorage.setItem("tocoto_idioma",l);}catch(e){} todo(document.body); pinta(); }
+caja.querySelectorAll("button").forEach(function(b){ b.addEventListener("click",function(e){e.stopPropagation();pon(b.dataset.l);}); });
+function verCaja(){ caja.hidden=!(menu&&!menu.hidden); }
+if(menu) new MutationObserver(verCaja).observe(menu,{attributes:true,attributeFilter:["hidden"]});
+verCaja(); pinta(); todo(document.body);
+})();
+</script>
