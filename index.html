@@ -158,7 +158,7 @@ button:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
 
 /* 4-11-2026: página de inicio con la marca */
 #inicio{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-  background:radial-gradient(circle at 50% 45%,#EFEBE8 0%,#E6E1DD 55%,#D9D3CE 100%);cursor:pointer;transition:opacity .6s ease;padding:24px;box-sizing:border-box}
+  background:radial-gradient(circle at 50% 45%,#EFEBE8 0%,#E6E1DD 70%);cursor:pointer;transition:opacity .6s ease;padding:24px;box-sizing:border-box}
 #inicio.fuera{opacity:0;pointer-events:none}
 #inicio img{width:min(86vw,58vh,520px);height:auto;display:block;
   -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 72%);mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 72%)}
@@ -865,7 +865,10 @@ resize();nuevaPartida('dos');requestAnimationFrame(frame);
 </script>
 <script>
 (function(){var p=document.getElementById('inicio');if(!p)return;var hecho=false;
-  function quita(){if(hecho)return;hecho=true;p.classList.add('fuera');setTimeout(function(){p.remove();},700);}
+  /* 4-11-2026: las barras del móvil del color de esta página; al salir, vuelven a su color */
+  var mt=document.querySelector('meta[name="theme-color"]'),antes=mt?mt.getAttribute('content'):null;if(mt)mt.setAttribute('content','#E6E1DD');
+  function barras(){if(mt&&antes)mt.setAttribute('content',antes);}
+  function quita(){if(hecho)return;hecho=true;p.classList.add('fuera');barras();setTimeout(function(){p.remove();},700);}
   p.addEventListener('click',quita);p.addEventListener('keydown',quita);})();
 </script>
 </body>
