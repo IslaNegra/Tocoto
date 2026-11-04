@@ -204,7 +204,7 @@ button:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
 <div id="reglas" hidden><div class="card"><h2>Instrucciones</h2><div class="texto">
 <p>Coloca fichas en el tablero. Provoca conflictos para desplazarlas. Consigue puntos por cada ficha que logres subir a la esquina superior izquierda.</p>
 <h3>Conflictos</h3><ul>
-<li>Dos fichas del mismo color o con la misma forma en las filas verticales generan un conflicto que has de resolver moviendo una de ellas a la izquierda.</li>
+<li>Dos fichas del mismo color o con la misma forma en las filas verticales generan un conflicto que has de resolver moviendo una de ellas hacia la izquierda.</li>
 <li>Dos fichas del mismo color o con la misma forma en las filas horizontales generan un conflicto que has de resolver moviendo una de ellas hacia arriba.</li></ul>
 <h3>1 vs 1, 1 vs IA</h3><ul>
 <li>Por cada ficha de tu montón que consigas llevar a la esquina del rival ganas 5 puntos.</li>
@@ -565,9 +565,9 @@ async function mover(r,c,fluido){
   ST.busy=false;ui();
 }
 async function pasar(){
-  if(ST.busy||ST.phase!=='move')return;if(ST.modo==='ia'&&ST.cur===1)(window.efecto||function(){})('paso',.9);
+  if(ST.busy||ST.phase!=='move')return;(window.efecto||function(){})('paso',.9);
   if(ST.sel!=null)await soltar(true);
-  if(ST.modo==='solo'){if(ST.piles[0].length)return;if(anyConflict()){senalarConflictos();return;}fin();return;}
+  if(ST.modo==='solo'){if(ST.piles[0].length)return;if(anyConflict()){(window.efecto||function(){})('error',.85);senalarConflictos();return;}fin();return;}
   if(anyConflict()){ST.pen[ST.cur]++;(window.efecto||function(){})('error',.85);floatText('−1',new T3.Vector3(0,.8,0).add(PILE[ST.cur].clone().multiplyScalar(.55)),'#FF6B4A');return;}
   if(!ST.piles[0].length&&!ST.piles[1].length){fin();return;}
   ST.busy=true;ST.phase='turn';ui();
@@ -601,7 +601,7 @@ function fin(){
 document.getElementById('otraPartida').addEventListener('click',()=>{document.getElementById('fin').hidden=true;cerrarRed();document.getElementById('menu').hidden=false;});
 document.getElementById('mDos').addEventListener('click',()=>{document.getElementById('menu').hidden=true;nuevaPartida('dos');});
 document.getElementById('mSolo').addEventListener('click',()=>{document.getElementById('menu').hidden=true;nuevaPartida('solo');});
-pasarBtn.addEventListener('click',()=>{if(!miTurno())return;(window.efecto||function(){})('paso',.9);act('pasar');});
+pasarBtn.addEventListener('click',()=>{if(!miTurno())return;act('pasar');});
 
 // ---------- toques ----------
 const ray=new T3.Raycaster(),ptr=new T3.Vector2();let down=null;
@@ -620,7 +620,7 @@ function tap(x,y){
   if(!miTurno())return;
   const p=ST.cur;
   if(ST.phase==='draw'){const h=hits(x,y,pileObjs[p]);if(h.length)act('robar');return;}
-  if(ST.modo==='solo'&&ST.phase==='move'&&ST.sel==null&&hits(x,y,pileObjs[0]).length){if(!anyConflict())robar();else senalarConflictos();return;}
+  if(ST.modo==='solo'&&ST.phase==='move'&&ST.sel==null&&hits(x,y,pileObjs[0]).length){if(!anyConflict())robar();else{(window.efecto||function(){})('error',.85);senalarConflictos();}return;}
   const glows=glowPool.filter(g=>g&&g.userData.on);
   const hg=hits(x,y,glows);
   if(ST.phase==='place'){
@@ -810,7 +810,8 @@ let last=performance.now();
 // aviso del montón: la ficha de arriba da un saltito cada 1,2 s mientras te toca coger ficha
 let saltoT0=null,saltoObj=null;
 function avisoMonton(now){
-  const toca=!!(ST&&ST.phase==='draw'&&!ST.busy&&ST.piles[ST.cur]&&ST.piles[ST.cur].length&&miTurno()&&document.getElementById('menu').hidden);
+  const toca=!!(ST&&!ST.busy&&ST.piles[ST.cur]&&ST.piles[ST.cur].length&&miTurno()&&document.getElementById('menu').hidden&&
+    (ST.phase==='draw'||(ST.modo==='solo'&&ST.phase==='move'&&ST.sel==null&&!anyConflict())));
   const p=ST?ST.cur:0,ps=pileObjs[p]||[],o=toca?ps[ps.length-1]:null;
   if(saltoObj&&saltoObj!==o){saltoObj.rotation.z=0;if(saltoObj.userData.baseY!=null)saltoObj.position.y=saltoObj.userData.baseY;saltoObj=null;}
   if(!o){saltoT0=null;return;}
@@ -914,11 +915,11 @@ resize();nuevaPartida('dos');requestAnimationFrame(frame);
 (function(){
 "use strict";
 var EN={
-"Solitario":"Solitaire","1 vs IA":"1 vs AI","Tablero y fichas":"Board & pieces","Instrucciones":"How to play","Volver":"Back","Menú":"Menu",
+"Solitario":"Solitaire","1 vs IA":"1 vs AI","Tablero y fichas":"Board & tiles","Instrucciones":"How to play","Volver":"Back","Menú":"Menu",
 "toca para empezar":"tap to start","Pasar turno":"End turn","Terminar":"Finish",
 "Tu turno":"Your turn","Turno de la máquina":"Computer's turn","Turno del rival":"Opponent's turn","Toca tu montón":"Tap your pile",
-"Pon la ficha en una casilla iluminada":"Place the piece on a lit square","Toca adónde la mueves":"Tap where to move it",
-"Mueve una ficha o pasa turno":"Move a piece or end your turn","Resuelve los conflictos y toca el montón":"Solve the conflicts and tap your pile",
+"Pon la ficha en una casilla iluminada":"Place the tile on a lit square","Toca adónde la mueves":"Tap where to move it",
+"Mueve una ficha o pasa turno":"Move a tile or end your turn","Resuelve los conflictos y toca el montón":"Solve the conflicts and tap your pile",
 "Resuelve los conflictos y termina":"Solve the conflicts and finish","¿Quién empieza?":"Who goes first?","Empiezas tú":"You go first",
 "Empieza la máquina":"The computer goes first","La máquina está pensando…":"The computer is thinking…",
 "¿Volver al menú?":"Back to menu?","Se pierde esta partida.":"This game will be lost.","Sí":"Yes",
@@ -929,17 +930,17 @@ var EN={
 "No se ha podido cargar el motor 3D. Recarga la página.":"The 3D engine could not load. Reload the page.",
 "¡Has ganado!":"You win!","Gana la máquina":"The computer wins","Gana el rival":"Your opponent wins","Empate":"Draw","Recuento":"Score",
 "Tú":"You","Rival":"Opponent","Máquina":"Computer","Mías":"Mine","Del rival":"Opponent's","Ganadas":"Won","Caídas":"Fallen","Pasar":"Turn penalty",
-"Volver al menú":"Back to menu","Tablero":"Board","Fichas":"Pieces","Jugador 1":"Player 1","Jugador 2":"Player 2",
+"Volver al menú":"Back to menu","Tablero":"Board","Fichas":"Tiles","Jugador 1":"Player 1","Jugador 2":"Player 2",
 "Nogal":"Walnut","Olivo":"Olive","Mármol":"Marble","Pizarra":"Slate","Madera clara":"Light wood","Nogal oscuro":"Dark walnut",
 "Mármol negro":"Black marble","Negras lisas":"Plain black","Jade blanco":"White jade","Pizarra gris":"Grey slate",
-"Coloca fichas en el tablero. Provoca conflictos para desplazarlas. Consigue puntos por cada ficha que logres subir a la esquina superior izquierda.":"Place pieces on the board. Create conflicts to move them. Score points for every piece you get to the top-left corner.",
+"Coloca fichas en el tablero. Provoca conflictos para desplazarlas. Consigue puntos por cada ficha que logres subir a la esquina superior izquierda.":"Place tiles on the board. Create conflicts to move them. Score points for every tile you get to the top-left corner.",
 "Conflictos":"Conflicts",
-"Dos fichas del mismo color o con la misma forma en las filas verticales generan un conflicto que has de resolver moviendo una de ellas a la izquierda.":"Two pieces of the same colour or the same shape in a column create a conflict. Solve it by moving one of them left.",
-"Dos fichas del mismo color o con la misma forma en las filas horizontales generan un conflicto que has de resolver moviendo una de ellas hacia arriba.":"Two pieces of the same colour or the same shape in a row create a conflict. Solve it by moving one of them up.",
-"Por cada ficha de tu montón que consigas llevar a la esquina del rival ganas 5 puntos.":"Each of your pieces you get to your opponent's corner: +5 points.",
-"Por cada ficha del rival que consigas llevar a su esquina consigues 1 punto.":"Each of your opponent's pieces you push to their corner: +1 point.",
-"Por cada ficha tuya que se salga del tablero pierdes 5 puntos.":"Each of your pieces that falls off the board: −5 points.",
-"Por cada ficha del rival que se salga del tablero pierdes 1 punto.":"Each of your opponent's pieces that falls off the board: −1 point.",
+"Dos fichas del mismo color o con la misma forma en las filas verticales generan un conflicto que has de resolver moviendo una de ellas hacia la izquierda.":"Two tiles of the same colour or the same shape in a column create a conflict. Solve it by moving one of them left.",
+"Dos fichas del mismo color o con la misma forma en las filas horizontales generan un conflicto que has de resolver moviendo una de ellas hacia arriba.":"Two tiles of the same colour or the same shape in a row create a conflict. Solve it by moving one of them up.",
+"Por cada ficha de tu montón que consigas llevar a la esquina del rival ganas 5 puntos.":"Each of your tiles you get to your opponent's corner: +5 points.",
+"Por cada ficha del rival que consigas llevar a su esquina consigues 1 punto.":"Each of your opponent's tiles you push to their corner: +1 point.",
+"Por cada ficha tuya que se salga del tablero pierdes 5 puntos.":"Each of your tiles that falls off the board: −5 points.",
+"Por cada ficha del rival que se salga del tablero pierdes 1 punto.":"Each of your opponent's tiles that falls off the board: −1 point.",
 "Si intentas pasar turno con un conflicto en el tablero pierdes 1 punto.":"Trying to end your turn with a conflict on the board: −1 point.",
 "Creadores":"Creators","1 vs 1, 1 vs IA":"1 vs 1, 1 vs AI",
 "Sonido":"Sound","Música":"Music","Efectos":"Effects","Silenciar":"Mute","Volumen":"Volume","Toca para empezar":"Tap to start","Tablero de juego en 3D":"3D game board","Código de la sala":"Lobby code"
